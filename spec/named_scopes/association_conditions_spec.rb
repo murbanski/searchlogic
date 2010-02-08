@@ -171,6 +171,17 @@ describe "Association Conditions" do
       :joins => "INNER JOIN \"users\" ON \"users\".id = \"audits\".auditable_id AND \"audits\".auditable_type = 'User'"
     }
   end
+
+  it "should delegate to polymorphic relationships first and plain relationships next" do
+    MagazineDoc.magazine_item_book_type_title_like("Design Patterns").proxy_options.should == {
+      :conditions => ["books.title LIKE ?", "%Design Patterns%"],
+      :joins => "INNER JOIN \"books\" ON \"books\".id = \"magazine_docs\".magazine_item_id AND \"magazine_docs\".magazine_item_type = 'Book'"
+    }
+    MagazineDoc.magazine_name_like("Main Warehouse").proxy_options.should == {
+      :conditions=>["magazines.name LIKE ?", "%Main Warehouse%"],
+      :joins=> [:magazine]
+    }
+  end
   
   it "should deep delegate to polymorphic relationships" do
     Audit.auditable_user_type_company_name_like("company").proxy_options.should == {
@@ -178,4 +189,5 @@ describe "Association Conditions" do
       :joins => ["INNER JOIN \"users\" ON \"users\".id = \"audits\".auditable_id AND \"audits\".auditable_type = 'User'", " INNER JOIN \"companies\" ON \"companies\".id = \"users\".company_id "]
     }
   end
+
 end

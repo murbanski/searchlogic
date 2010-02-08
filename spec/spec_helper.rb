@@ -72,6 +72,27 @@ ActiveRecord::Schema.define(:version => 1) do
     t.integer :order_id
     t.float :price
   end
+
+  create_table :magazines do |t|
+    t.string :name
+  end
+
+  create_table :magazine_docs do |t|
+    t.integer :doc_type
+    t.integer :magazine_id
+    t.integer :magazine_item_id
+    t.string :magazine_item_type
+  end
+
+  create_table :books do |t|
+    t.string :author
+    t.string :title
+  end
+
+  create_table :computers do |t|
+    t.string :vendor
+    t.string :cpu
+  end
 end
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
@@ -112,11 +133,32 @@ Spec::Runner.configure do |config|
     class LineItem < ActiveRecord::Base
       belongs_to :order
     end
+
+    class Magazine < ActiveRecord::Base
+      has_many :magazine_docs
+    end
+
+    class MagazineDoc < ActiveRecord::Base
+      belongs_to :magazine
+      belongs_to :magazine_item, :polymorphic => true
+    end
+
+    class Book < ActiveRecord::Base
+      has_many :magazine_docs, :as => :magazine_item
+    end
+
+    class Computer < ActiveRecord::Base
+      has_many :magazine_docs, :as => :magazine_item
+    end
     
     Company.destroy_all
     User.destroy_all
     Order.destroy_all
     LineItem.destroy_all
+    MagazineDoc.destroy_all
+    Magazine.destroy_all
+    Book.destroy_all
+    Computer.destroy_all
   end
   
   config.after(:each) do
@@ -124,5 +166,9 @@ Spec::Runner.configure do |config|
     Object.send(:remove_const, :User)
     Object.send(:remove_const, :Order)
     Object.send(:remove_const, :LineItem)
+    Object.send(:remove_const, :MagazineDoc)
+    Object.send(:remove_const, :Magazine)
+    Object.send(:remove_const, :Book)
+    Object.send(:remove_const, :Computer)
   end
 end
