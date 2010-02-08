@@ -179,7 +179,7 @@ describe "Association Conditions" do
     }
     MagazineDoc.magazine_name_like("Main Warehouse").proxy_options.should == {
       :conditions=>["magazines.name LIKE ?", "%Main Warehouse%"],
-      :joins=> [:magazine]
+      :joins=> :magazine
     }
   end
   
